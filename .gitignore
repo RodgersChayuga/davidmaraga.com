@@ -1,0 +1,44 @@
+# macOS system files
+.DS_Store
+src/.DS_Store
+src/app/.DS_Store
+tests/.DS_Store
+
+# Node modules
+dist/
+build/
+node_modules/
+
+# Next.js build output
+.next/
+
+# Environment files
+.env
+.env.*
+test.env
+
+# Lock files (optional, remove if you want to track lock files)
+pnpm-lock.yaml
+
+# Logs
+*.log
+
+# TypeScript build info
+*.tsbuildinfo
+
+# Local config
+*.local
+
+# Editor swap/backup/temp files
+*.swp
+*.tmp
+*.bak
+
+# Cache
+*.cache
+
+# Package tarballs
+*.tgz
+
+# Coverage
+coverage/ 
