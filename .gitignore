@@ -1,7 +1,6 @@
 # macOS system files
 .DS_Store
-src/.DS_Store
-src/app/.DS_Store
+app/.DS_Store
 tests/.DS_Store
 
 # Node modules

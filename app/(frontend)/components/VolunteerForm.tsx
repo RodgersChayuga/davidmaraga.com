@@ -1,7 +1,7 @@
 'use client'
 
 import React, { useState } from 'react'
-import stationsData from '../../../../stations.json'
+import stationsData from '../../../stations.json'
 import toast, { Toaster } from 'react-hot-toast'
 import 'react-phone-number-input/style.css'
 import { createVolunteer } from './actions'
