@@ -2,7 +2,7 @@
 'use client'
 
 import React, { useState, useEffect } from 'react'
-import countiesData from '../../../../../counties.json'
+import countiesData from '@/counties.json'
 
 // Inline styles to avoid import map issues
 const styles = {
@@ -192,7 +192,7 @@ const BulkSMSButton: React.FC = () => {
 
   return (
     <>
-      <button type="button" style={{...styles.button, ...styles.buttonPrimary}} onClick={() => setIsModalOpen(true)}>
+      <button type="button" style={{ ...styles.button, ...styles.buttonPrimary }} onClick={() => setIsModalOpen(true)}>
         Send Bulk SMS
       </button>
 
@@ -252,12 +252,12 @@ const BulkSMSButton: React.FC = () => {
             </div>
 
             <div style={styles.modalActions}>
-              <button type="button" style={{...styles.button, ...styles.buttonSecondary}} onClick={() => setIsModalOpen(false)}>
+              <button type="button" style={{ ...styles.button, ...styles.buttonSecondary }} onClick={() => setIsModalOpen(false)}>
                 Cancel
               </button>
               <button
                 type="button"
-                style={{...styles.button, ...styles.buttonPrimary, ...(sending || !message.trim() ? styles.buttonPrimaryDisabled : {})}}
+                style={{ ...styles.button, ...styles.buttonPrimary, ...(sending || !message.trim() ? styles.buttonPrimaryDisabled : {}) }}
                 onClick={handleSendSMS}
                 disabled={sending || !message.trim()}
               >

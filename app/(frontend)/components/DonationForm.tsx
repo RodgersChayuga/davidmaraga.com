@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState, useEffect } from 'react'
+import React, { useState } from 'react'
 import { createTransaction, checkVerificationStatus } from './actions'
 import { Toaster, toast } from 'react-hot-toast'
 import 'react-phone-number-input/style.css'
@@ -121,11 +121,10 @@ const DonationForm: React.FC = () => {
               <button
                 key={amount}
                 type="button"
-                className={`w-full px-5 py-2 rounded-lg border-2 ${
-                  selectedAmount === amount
+                className={`w-full px-5 py-2 rounded-lg border-2 ${selectedAmount === amount
                     ? 'bg-green-600 text-white border-green-600'
                     : 'bg-gray-100 text-gray-800 border-gray-200 hover:bg-gray-200'
-                } transition-colors duration-200`}
+                  } transition-colors duration-200`}
                 onClick={() => handleAmountChange(amount)}
               >
                 {amount.toLocaleString()}
@@ -133,11 +132,10 @@ const DonationForm: React.FC = () => {
             ))}
             <button
               type="button"
-              className={`w-full px-5 py-2 rounded-lg border-2 ${
-                selectedAmount === 'other'
+              className={`w-full px-5 py-2 rounded-lg border-2 ${selectedAmount === 'other'
                   ? 'bg-green-600 text-white border-green-600'
                   : 'bg-gray-100 text-gray-800 border-gray-200 hover:bg-gray-200'
-              } transition-colors duration-200`}
+                } transition-colors duration-200`}
               onClick={() => handleAmountChange('other')}
             >
               Other
