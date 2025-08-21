@@ -95,11 +95,13 @@ export default function Header() {
               Join the Movement
             </Link>
             <Link
-              href="/donate"
-              className="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 font-medium transition duration-300 btn-animate hover-lift animate-fade-in-delay-500"
-            >
-              Donate
-            </Link>
+            href="https://donate.davidmaraga.com/"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 font-medium transition duration-300 btn-animate hover-lift animate-fade-in-delay-500"
+          >
+            Donate
+          </Link>
           </nav>
 
           {/* Mobile menu button */}
