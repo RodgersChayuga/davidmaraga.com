@@ -3,9 +3,7 @@ import React, { useEffect, useState } from 'react'
 import VolunteersInCountiesGraph from './VolunteersInCountiesGraph'
 import styled from 'styled-components'
 
-interface Donation {
-  amount: number
-}
+
 
 const Container = styled.div`
   padding: 24px;
@@ -74,35 +72,17 @@ const Icon = styled.svg`
 
 const BeforeDashboard = () => {
   const [totalVolunteers, setTotalVolunteers] = useState<number | null>(null)
-  const [donationStats, setDonationStats] = useState({ total: 0, largest: 0, average: 0, count: 0 })
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const [volunteersRes, donationsRes] = await Promise.all([
-          fetch('/api/volunteers?limit=1'),
-          fetch('/api/donations?limit=10000'), // Adjust limit as needed
-        ])
-
+        const volunteersRes = await fetch('/api/volunteers?limit=1')
         const volunteersData = await volunteersRes.json()
         setTotalVolunteers(volunteersData.totalDocs)
-
-        const donationsData = await donationsRes.json()
-        if (donationsData.docs && donationsData.docs.length > 0) {
-          const amounts = donationsData.docs.map((d: Donation) => d.amount)
-          const total = amounts.reduce((acc: number, cur: number) => acc + cur, 0)
-          const largest = Math.max(...amounts)
-          const average = total / amounts.length
-          const count = donationsData.totalDocs
-          setDonationStats({ total, largest, average, count })
-        } else {
-          setDonationStats({ total: 0, largest: 0, average: 0, count: 0 })
-        }
       } catch (error) {
         console.error('Error fetching data for dashboard:', error)
         setTotalVolunteers(0)
-        setDonationStats({ total: 0, largest: 0, average: 0, count: 0 })
       } finally {
         setLoading(false)
       }
@@ -138,95 +118,7 @@ const BeforeDashboard = () => {
           </CardContent>
         </StatCard>
 
-        {/* Number of Contributions Card */}
-        <StatCard>
-          <CardContent>
-            <CardText>
-              <CardLabel># Contributions</CardLabel>
-              <CardNumber>{donationStats.count}</CardNumber>
-            </CardText>
-            <IconCircle color="#dcfce7">
-              <Icon viewBox="0 0 24 24">
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  stroke="#10b981"
-                  d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-                />
-              </Icon>
-            </IconCircle>
-          </CardContent>
-        </StatCard>
 
-        {/* Donations Card */}
-        <StatCard>
-          <CardContent>
-            <CardText>
-              <CardLabel>Total Contributions</CardLabel>
-              <CardNumber>Ksh {donationStats.total.toLocaleString()}</CardNumber>
-            </CardText>
-            <IconCircle color="#dcfce7">
-              <Icon viewBox="0 0 24 24">
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  stroke="#10b981"
-                  d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-                />
-              </Icon>
-            </IconCircle>
-          </CardContent>
-        </StatCard>
-
-        {/* Largest Donation Card */}
-        <StatCard>
-          <CardContent>
-            <CardText>
-              <CardLabel>Largest Contribution</CardLabel>
-              <CardNumber>Ksh {donationStats.largest.toLocaleString()}</CardNumber>
-            </CardText>
-            <IconCircle color="#dcfce7">
-              <Icon viewBox="0 0 24 24">
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  stroke="#10b981"
-                  d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-                />
-              </Icon>
-            </IconCircle>
-          </CardContent>
-        </StatCard>
-
-        {/* Average Donation Card */}
-        <StatCard>
-          <CardContent>
-            <CardText>
-              <CardLabel>Average Contribution</CardLabel>
-              <CardNumber>
-                Ksh{' '}
-                {donationStats.average.toLocaleString(undefined, {
-                  minimumFractionDigits: 2,
-                  maximumFractionDigits: 2,
-                })}
-              </CardNumber>
-            </CardText>
-            <IconCircle color="#dcfce7">
-              <Icon viewBox="0 0 24 24">
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  stroke="#10b981"
-                  d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-                />
-              </Icon>
-            </IconCircle>
-          </CardContent>
-        </StatCard>
 
         {/* Impact Stats */}
         {/* <StatCard>

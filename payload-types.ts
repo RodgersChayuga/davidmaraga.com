@@ -74,8 +74,6 @@ export interface Config {
     'volunteer-reasons': VolunteerReason;
     'press-statements': PressStatement;
     gall: Gall;
-    'transaction-request-payloads': TransactionRequestPayload;
-    donations: Donation;
     timeline: Timeline;
     'payload-locked-documents': PayloadLockedDocument;
     'payload-preferences': PayloadPreference;
@@ -94,8 +92,6 @@ export interface Config {
     'volunteer-reasons': VolunteerReasonsSelect<false> | VolunteerReasonsSelect<true>;
     'press-statements': PressStatementsSelect<false> | PressStatementsSelect<true>;
     gall: GallSelect<false> | GallSelect<true>;
-    'transaction-request-payloads': TransactionRequestPayloadsSelect<false> | TransactionRequestPayloadsSelect<true>;
-    donations: DonationsSelect<false> | DonationsSelect<true>;
     timeline: TimelineSelect<false> | TimelineSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
     'payload-preferences': PayloadPreferencesSelect<false> | PayloadPreferencesSelect<true>;
@@ -284,61 +280,6 @@ export interface Gall {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "transaction-request-payloads".
- */
-export interface TransactionRequestPayload {
-  id: number;
-  internal_id?: string | null;
-  external_id?: string | null;
-  verify_id?: string | null;
-  isComplete?: boolean | null;
-  request_data?:
-    | {
-        [k: string]: unknown;
-      }
-    | unknown[]
-    | string
-    | number
-    | boolean
-    | null;
-  callback_data?:
-    | {
-        [k: string]: unknown;
-      }
-    | unknown[]
-    | string
-    | number
-    | boolean
-    | null;
-  user_data?:
-    | {
-        [k: string]: unknown;
-      }
-    | unknown[]
-    | string
-    | number
-    | boolean
-    | null;
-  updatedAt: string;
-  createdAt: string;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "donations".
- */
-export interface Donation {
-  id: number;
-  amount: number;
-  name: string;
-  phone: string;
-  email: string;
-  message?: string | null;
-  verify_id: string;
-  updatedAt: string;
-  createdAt: string;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "timeline".
  */
 export interface Timeline {
@@ -401,14 +342,6 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'gall';
         value: number | Gall;
-      } | null)
-    | ({
-        relationTo: 'transaction-request-payloads';
-        value: number | TransactionRequestPayload;
-      } | null)
-    | ({
-        relationTo: 'donations';
-        value: number | Donation;
       } | null)
     | ({
         relationTo: 'timeline';
@@ -556,35 +489,6 @@ export interface GallSelect<T extends boolean = true> {
   title?: T;
   slug?: T;
   images?: T;
-  updatedAt?: T;
-  createdAt?: T;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "transaction-request-payloads_select".
- */
-export interface TransactionRequestPayloadsSelect<T extends boolean = true> {
-  internal_id?: T;
-  external_id?: T;
-  verify_id?: T;
-  isComplete?: T;
-  request_data?: T;
-  callback_data?: T;
-  user_data?: T;
-  updatedAt?: T;
-  createdAt?: T;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "donations_select".
- */
-export interface DonationsSelect<T extends boolean = true> {
-  amount?: T;
-  name?: T;
-  phone?: T;
-  email?: T;
-  message?: T;
-  verify_id?: T;
   updatedAt?: T;
   createdAt?: T;
 }

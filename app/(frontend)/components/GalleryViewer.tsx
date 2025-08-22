@@ -83,7 +83,7 @@ export default function GalleryViewer({ gallery }: GalleryViewerProps) {
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 mb-12">
         {currentImages.map((item, index) => (
           <div
-            key={index}
+            key={`${startIndex}-${index}`}
             className="relative aspect-square bg-gray-200 rounded-lg overflow-hidden cursor-pointer group hover-lift transition duration-300"
             onClick={() => openLightbox(index)}
           >

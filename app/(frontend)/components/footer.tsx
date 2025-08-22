@@ -25,7 +25,7 @@ export default function Footer() {
                 About Us
               </Link>
 
-              <Link href="/donate" className="block text-gray-300 hover:text-white">
+              <Link href="https://donations.davidmaraga.com/" target="_blank" rel="noopener noreferrer" className="block text-gray-300 hover:text-white">
                 Donate
               </Link>
               <Link href="/volunteer" className="block text-gray-300 hover:text-white">

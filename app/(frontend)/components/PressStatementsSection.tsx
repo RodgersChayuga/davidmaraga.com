@@ -24,7 +24,7 @@ export default function PressStatementsSection({
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {pressStatements.slice(-3).map((statement, index) => (
             <div
-              key={statement.title}
+              key={statement.id}
               className={`bg-white rounded-xl shadow-lg ellipsis overflow-hidden hover:shadow-xl transition duration-300 hover-lift animate-fade-in-up animate-delay-${index * 200}`}
             >
               <div className="p-6">

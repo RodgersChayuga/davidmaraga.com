@@ -138,7 +138,9 @@ export default function AboutPage() {
               Volunteer With Us
             </Link>
             <Link
-              href="/donate"
+              href="https://donations.davidmaraga.com/"
+              target="_blank"
+              rel="noopener noreferrer"
               className="bg-green-500 text-white hover:bg-green-600 px-8 py-4 rounded-full text-lg font-semibold shadow-md transition-all duration-300 ease-in-out transform hover:scale-105"
             >
               Donate Now

@@ -73,7 +73,9 @@ export default function HeroSection() {
                 View Our Platform
               </a> */}
               <a
-                href="/donate"
+                href="https://donations.davidmaraga.com/"
+                target="_blank"
+                rel="noopener noreferrer"
                 className="bg-red-600 text-white px-8 py-4 rounded-lg font-semibold hover:bg-red-700 text-center transition duration-300 shadow-lg btn-political btn-animate hover-lift"
               >
                 Contribute Now

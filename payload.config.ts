@@ -11,14 +11,9 @@ import { Users } from './collections/Users'
 import { Media } from './collections/Media'
 import { Volunteers } from './collections/Volunteers'
 import { VolunteerReasons } from './collections/VolunteerReasons'
-// import { NewsArticles } from './collections/NewsArticles'
 import { vercelBlobStorage } from '@payloadcms/storage-vercel-blob'
-// import { Events } from './collections/Events'
 import { PressStatements } from './collections/PressStatements'
-// import { Galleries } from './collections/Galleries'
 import { Gall } from './collections/Gall'
-import { TransactionRequestPayloads } from './collections/TransactionRequestPayloads'
-import { Donations } from './collections/Donations'
 import { HomePage } from './globals/HomePage'
 import { Timeline } from './collections/Timeline'
 import { Logs } from './collections/Logs'
@@ -56,8 +51,6 @@ export default buildConfig({
     VolunteerReasons,
     PressStatements,
     Gall,
-    TransactionRequestPayloads,
-    Donations,
     Timeline,
   ],
   globals: [HomePage],

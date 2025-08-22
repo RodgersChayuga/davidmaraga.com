@@ -193,7 +193,9 @@ export default function VolunteerForm({
               Please consider supporting our cause by making a donation.
             </p>
             <a
-              href="/donate"
+              href="https://donations.davidmaraga.com/"
+              target="_blank"
+              rel="noopener noreferrer"
               className="mt-4 inline-block px-6 py-3 bg-white text-green-600 rounded-md shadow-lg hover:bg-gray-100 transition-colors duration-200"
             >
               Donate Now

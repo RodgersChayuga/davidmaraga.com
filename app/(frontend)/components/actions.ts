@@ -1,16 +1,7 @@
 'use server'
 import { getPayload } from 'payload'
 import config from '@/payload.config'
-import { loginAndTransact } from '@/app/utils/mookh-pay'
 import { parse } from 'rss-to-json'
-
-interface DonationFormData {
-  amount: number
-  name: string
-  phone: string
-  email: string
-  message: string
-}
 
 export const getPressStatements = async (reCaptchaToken: string) => {
   'use server'
@@ -158,65 +149,7 @@ export const getHomePage = async (reCaptchaToken: string) => {
   }
 }
 
-export const createTransaction = async (userData: DonationFormData) => {
-  'use server'
-  try {
-    const payload = await getPayload({ config })
-    const internalId = Math.random().toString(36).substr(2, 9) // Generate random ID
-    const verifyID = Math.random().toString(36).substr(2, 9) // Generate random ID
 
-    const transaction = await payload.create({
-      collection: 'transaction-request-payloads',
-      data: {
-        internal_id: internalId,
-        verify_id: verifyID,
-
-        user_data: JSON.stringify(userData),
-      },
-    })
-
-    const request_data = await loginAndTransact(internalId, userData, transaction.id.toString())
-
-    await payload.update({
-      collection: 'transaction-request-payloads',
-      id: transaction.id,
-      data: {
-        request_data: JSON.stringify(request_data),
-        external_id: request_data.payload.order.id,
-      },
-    })
-
-    return { success: true, message: 'Transaction created successfully!', verifyID }
-  } catch (error) {
-    console.error('Error creating transaction:', error)
-    return { success: false, message: 'Failed to create transaction.' }
-  }
-}
-
-export const checkVerificationStatus = async (verifyId: string) => {
-  'use server'
-  try {
-    const payload = await getPayload({ config })
-
-    const donations = await payload.find({
-      collection: 'donations',
-      where: {
-        verify_id: {
-          equals: verifyId,
-        },
-      },
-    })
-
-    if (!donations.docs.length) {
-      return { success: false }
-    }
-
-    return { success: true }
-  } catch (error) {
-    console.error('Error checking verification status:', error)
-    return { success: false, message: 'Failed to check verification status.' }
-  }
-}
 
 export const getVolunteerCount = async (reCaptchaToken: string) => {
   'use server'

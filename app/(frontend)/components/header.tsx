@@ -39,9 +39,8 @@ export default function Header() {
               <button className="text-gray-700 hover:text-green-600 font-medium transition cursor-pointer pb-4 duration-300 hover-lift animate-fade-in animate-delay-200 focus:outline-none">
                 About Maraga
                 <svg
-                  className={`w-4 h-4 inline-block ml-1 transform transition-transform duration-200 ${
-                    isAboutDropdownOpen ? 'rotate-180' : ''
-                  }`}
+                  className={`w-4 h-4 inline-block ml-1 transform transition-transform duration-200 ${isAboutDropdownOpen ? 'rotate-180' : ''
+                    }`}
                   fill="none"
                   viewBox="0 0 24 24"
                   stroke="currentColor"
@@ -95,13 +94,13 @@ export default function Header() {
               Join the Movement
             </Link>
             <Link
-            href="https://donate.davidmaraga.com/"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 font-medium transition duration-300 btn-animate hover-lift animate-fade-in-delay-500"
-          >
-            Donate
-          </Link>
+              href="https://donations.davidmaraga.com/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 font-medium transition duration-300 btn-animate hover-lift animate-fade-in-delay-500"
+            >
+              Donate
+            </Link>
           </nav>
 
           {/* Mobile menu button */}
@@ -143,9 +142,8 @@ export default function Header() {
             >
               About Maraga
               <svg
-                className={`w-4 h-4 inline-block ml-1 transform transition-transform duration-200 ${
-                  isAboutDropdownOpen ? 'rotate-180' : ''
-                }`}
+                className={`w-4 h-4 inline-block ml-1 transform transition-transform duration-200 ${isAboutDropdownOpen ? 'rotate-180' : ''
+                  }`}
                 fill="none"
                 viewBox="0 0 24 24"
                 stroke="currentColor"
@@ -198,7 +196,9 @@ export default function Header() {
               Join the Movement
             </Link>
             <Link
-              href="/donate"
+              href="https://donations.davidmaraga.com/"
+              target="_blank"
+              rel="noopener noreferrer"
               className="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 font-medium inline-block text-center transition duration-300 btn-animate hover-lift animate-fade-in-left animate-delay-500"
               onClick={() => setIsMenuOpen(false)}
             >

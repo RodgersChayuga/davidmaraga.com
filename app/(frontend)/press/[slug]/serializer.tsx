@@ -22,22 +22,22 @@ type LexicalNode = TextNode | ElementNode;
 const serialize = (children: LexicalNode[]) => children.map((node, i) => {
   if (node.type === 'text' && 'text' in node) {
     const textNode = node as TextNode;
-    let text = <span className="mb-4" dangerouslySetInnerHTML={{ __html: escapeHTML(textNode.text) }} />;
+    let text = <span key={`text-${i}`} className="mb-4" dangerouslySetInnerHTML={{ __html: escapeHTML(textNode.text) }} />;
 
     if (textNode.bold) {
-      text = <strong key={i}>{text}</strong>;
+      text = <strong key={`bold-${i}`}>{text}</strong>;
     }
 
     if (textNode.italic) {
-      text = <em key={i}>{text}</em>;
+      text = <em key={`italic-${i}`}>{text}</em>;
     }
 
     if (textNode.underline) {
-      text = <u key={i}>{text}</u>;
+      text = <u key={`underline-${i}`}>{text}</u>;
     }
 
     if (textNode.strikethrough) {
-      text = <s key={i}>{text}</s>;
+      text = <s key={`strikethrough-${i}`}>{text}</s>;
     }
 
     return text;

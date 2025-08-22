@@ -79,9 +79,8 @@ v. Public participation`,
               >
                 <h3 className="text-2xl font-semibold text-gray-800 font-serif">{item.title}</h3>
                 <svg
-                  className={`w-7 h-7 text-gray-600 transform transition-transform duration-300 ${
-                    openAccordion === item.id ? 'rotate-180' : ''
-                  }`}
+                  className={`w-7 h-7 text-gray-600 transform transition-transform duration-300 ${openAccordion === item.id ? 'rotate-180' : ''
+                    }`}
                   fill="none"
                   viewBox="0 0 24 24"
                   stroke="currentColor"
@@ -122,7 +121,9 @@ v. Public participation`,
               Volunteer With Us
             </a>
             <a
-              href="/donate"
+              href="https://donations.davidmaraga.com/"
+              target="_blank"
+              rel="noopener noreferrer"
               className="bg-green-500 text-white hover:bg-green-600 px-8 py-4 rounded-full text-lg font-semibold shadow-md transition-all duration-300 ease-in-out transform hover:scale-105"
             >
               Donate Now
