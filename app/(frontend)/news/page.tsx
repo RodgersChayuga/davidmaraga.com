@@ -12,6 +12,8 @@ const getPressStatements = cache(async (): Promise<PressStatement[]> => {
   return pressStatements.docs
 })
 
+export const revalidate = 60
+
 export default async function NewsPage() {
   const pressStatements = await getPressStatements()
 
