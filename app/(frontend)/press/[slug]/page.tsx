@@ -27,6 +27,12 @@ export default async function PressStatementPage({ params }: { params: Promise<{
     return notFound()
   }
 
+  // Check if content exists and has the expected structure
+  const hasContent = statement.content &&
+    statement.content.root &&
+    statement.content.root.children &&
+    Array.isArray(statement.content.root.children)
+
   return (
     <main className="py-16 bg-gray-50">
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -48,10 +54,21 @@ export default async function PressStatementPage({ params }: { params: Promise<{
               </span>
             </div>
 
-            <div
-              className="prose prose-lg max-w-none mx-auto text-gray-800"
-            >
-              {serialize(statement.content.root.children)}
+            <div className="prose prose-lg max-w-none mx-auto text-gray-800">
+              {hasContent ? (
+                serialize(statement.content.root.children)
+              ) : (
+                <div className="text-center py-8">
+                  <p className="text-gray-600">
+                    {statement.excerpt || "Content not available"}
+                  </p>
+                  {!statement.excerpt && (
+                    <p className="text-gray-500 text-sm mt-2">
+                      This press statement is being prepared.
+                    </p>
+                  )}
+                </div>
+              )}
             </div>
           </div>
         </article>
