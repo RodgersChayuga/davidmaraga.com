@@ -2,9 +2,7 @@
 
 import React, { useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { getPayload } from 'payload'
-import config from '@/payload.config'
-import { PressStatement } from '@/payload-types'
+import { createPressStatement } from '@/app/(frontend)/components/actions'
 
 interface PressStatementFormData {
     title: string
@@ -42,48 +40,19 @@ export default function NewPressStatementPage() {
         setSuccess('')
 
         try {
-            const payload = await getPayload({ config })
+            const result = await createPressStatement(formData)
 
-            // Create the press statement
-            const newStatement = await payload.create({
-                collection: 'press-statements',
-                data: {
-                    title: formData.title,
-                    date: formData.date,
-                    excerpt: formData.excerpt,
-                    content: {
-                        root: {
-                            type: 'root',
-                            children: [
-                                {
-                                    type: 'p',
-                                    version: 1,
-                                    children: [
-                                        {
-                                            type: 'text',
-                                            version: 1,
-                                            text: formData.content
-                                        }
-                                    ]
-                                }
-                            ],
-                            direction: 'ltr',
-                            format: '',
-                            indent: 0,
-                            version: 1
-                        }
-                    }
-                }
-            })
+            if (result.success) {
+                setSuccess('Press statement created successfully!')
+                setFormData(initialFormData)
 
-            setSuccess('Press statement created successfully!')
-            setFormData(initialFormData)
-
-            // Redirect to the press statements page after a short delay
-            setTimeout(() => {
-                router.push('/press')
-            }, 2000)
-
+                // Redirect to the press statements page after a short delay
+                setTimeout(() => {
+                    router.push('/press')
+                }, 2000)
+            } else {
+                setError(result.error || 'Failed to create press statement')
+            }
         } catch (err) {
             console.error('Error creating press statement:', err)
             setError('Failed to create press statement. Please try again.')

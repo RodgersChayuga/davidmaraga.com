@@ -260,3 +260,50 @@ export const getFirstGallery = async (reCaptchaToken: string) => {
     return null
   }
 }
+
+export const createPressStatement = async (formData: {
+  title: string
+  date: string
+  excerpt: string
+  content: string
+}) => {
+  try {
+    const payload = await getPayload({ config })
+
+    const newStatement = await payload.create({
+      collection: 'press-statements',
+      data: {
+        title: formData.title,
+        date: formData.date,
+        excerpt: formData.excerpt,
+        content: {
+          root: {
+            type: 'root',
+            children: [
+              {
+                type: 'p',
+                version: 1,
+                children: [
+                  {
+                    type: 'text',
+                    version: 1,
+                    text: formData.content
+                  }
+                ]
+              }
+            ],
+            direction: 'ltr',
+            format: '',
+            indent: 0,
+            version: 1
+          }
+        }
+      }
+    })
+
+    return { success: true, data: newStatement }
+  } catch (error) {
+    console.error('Error creating press statement:', error)
+    return { success: false, error: 'Failed to create press statement' }
+  }
+}
