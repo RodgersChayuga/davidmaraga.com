@@ -2,6 +2,7 @@
 import { getPayload } from 'payload'
 import config from '@/payload.config'
 import { parse } from 'rss-to-json'
+import { revalidatePath } from 'next/cache'
 
 export const getPressStatements = async (reCaptchaToken: string) => {
   'use server'
@@ -300,6 +301,10 @@ export const createPressStatement = async (formData: {
         }
       }
     })
+
+    // Revalidate the press pages to show the new content
+    revalidatePath('/press')
+    revalidatePath('/')
 
     return { success: true, data: newStatement }
   } catch (error) {

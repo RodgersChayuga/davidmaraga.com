@@ -1,17 +1,19 @@
 import Link from "next/link"
 import { getPayload } from "payload"
-import { cache } from "react"
 import config from "@/payload.config"
 import { PressStatement } from "@/payload-types"
 
-const getPressStatements = cache(async (): Promise<PressStatement[]> => {
+const getPressStatements = async (): Promise<PressStatement[]> => {
   const payload = await getPayload({ config })
   const pressStatements = await payload.find({
     collection: "press-statements",
     sort: "-date",
   })
   return pressStatements.docs
-})
+}
+
+// Revalidate every 60 seconds
+export const revalidate = 60
 
 export default async function PressPage() {
   const pressStatements = await getPressStatements()
