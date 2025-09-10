@@ -271,6 +271,25 @@ export const createPressStatement = async (formData: {
   try {
     const payload = await getPayload({ config })
 
+    // Split content by double line breaks to create multiple paragraphs
+    const paragraphs = formData.content
+      .split(/\n\s*\n/)
+      .filter(paragraph => paragraph.trim().length > 0)
+      .map(paragraph => paragraph.trim())
+
+    // Create proper Lexical structure with multiple paragraphs
+    const children = paragraphs.map(paragraph => ({
+      type: 'p',
+      version: 1,
+      children: [
+        {
+          type: 'text',
+          version: 1,
+          text: paragraph
+        }
+      ]
+    }))
+
     const newStatement = await payload.create({
       collection: 'press-statements',
       data: {
@@ -280,19 +299,7 @@ export const createPressStatement = async (formData: {
         content: {
           root: {
             type: 'root',
-            children: [
-              {
-                type: 'p',
-                version: 1,
-                children: [
-                  {
-                    type: 'text',
-                    version: 1,
-                    text: formData.content
-                  }
-                ]
-              }
-            ],
+            children: children,
             direction: 'ltr',
             format: '',
             indent: 0,

@@ -54,9 +54,11 @@ export default async function PressStatementPage({ params }: { params: Promise<{
               </span>
             </div>
 
-            <div className="prose prose-lg max-w-none mx-auto text-gray-800">
+            <div className="prose max-w-none">
               {hasContent ? (
-                serialize(statement.content.root.children)
+                <div className="whitespace-pre-wrap text-gray-800 leading-relaxed">
+                  {serialize(statement.content.root.children)}
+                </div>
               ) : (
                 <div className="text-center py-8">
                   <p className="text-gray-600">
