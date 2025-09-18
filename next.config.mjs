@@ -2,7 +2,10 @@
 const nextConfig = {
   // Your Next.js config here
   images: {
-    remotePatterns: [new URL('https://www.davidmaraga.com/**')],
+    remotePatterns: [
+      { protocol: 'https', hostname: 'www.davidmaraga.com', pathname: '/**' },
+      { protocol: 'https', hostname: 'images.unsplash.com', pathname: '/**' },
+    ],
   },
   webpack: (webpackConfig) => {
     webpackConfig.resolve.extensionAlias = {

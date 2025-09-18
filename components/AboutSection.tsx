@@ -1,8 +1,22 @@
 import Image from 'next/image'
-import type { HomePage } from '@/payload-types'
+
+interface HomePage {
+  title: string
+  description: string
+  image: {
+    id: number
+    url: string
+    alt: string
+  } | null
+  attributes: Array<{
+    title: string
+    description: string
+  }>
+}
 
 export default function AboutSection({ homePage }: { homePage: HomePage }) {
   const { title, description, image, attributes } = homePage
+
   const candidateInfo = {
     title,
     description,
@@ -12,10 +26,10 @@ export default function AboutSection({ homePage }: { homePage: HomePage }) {
       alt: typeof image === 'object' && image ? image.alt : '',
     },
     keyPoints: attributes
-      ? attributes.map(({ title, description }) => ({
-          title,
-          description,
-        }))
+      ? attributes.map(({ title, description }: { title: string; description: string }) => ({
+        title,
+        description,
+      }))
       : [],
   }
 
@@ -36,8 +50,12 @@ export default function AboutSection({ homePage }: { homePage: HomePage }) {
                 <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent"></div>
               </div>
             ) : (
-              <div className="h-96 lg:h-[500px] rounded-2xl overflow-hidden shadow-2xl">
-                <div className="loading-skeleton" />
+              <div className="h-96 lg:h-[500px] rounded-2xl overflow-hidden shadow-2xl bg-gradient-to-br from-green-600 to-green-800 flex items-center justify-center">
+                <div className="text-center text-white">
+                  <div className="text-6xl font-bold mb-4">DM</div>
+                  <div className="text-xl font-semibold">David Maraga</div>
+                  <div className="text-sm opacity-90">Presidential Candidate 2027</div>
+                </div>
               </div>
             )}
             {candidateInfo && (
@@ -65,7 +83,7 @@ export default function AboutSection({ homePage }: { homePage: HomePage }) {
                 </p>
 
                 <div className="space-y-4 mb-8">
-                  {candidateInfo.keyPoints.slice(0, 3).map((point, index) => {
+                  {candidateInfo.keyPoints.slice(0, 3).map((point: { title: string; description: string }, index: number) => {
                     if (!point || !point.title) return null
                     return (
                       <div

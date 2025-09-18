@@ -7,24 +7,19 @@ async function main() {
     const volunteerReasons = await prisma.volunteerReason.createMany({
         data: [
             {
-                title: 'Justice and Rule of Law',
-                description: 'Supporting a leader committed to upholding justice and the rule of law in Kenya'
+                reason: 'Justice and Rule of Law - Supporting a leader committed to upholding justice and the rule of law in Kenya'
             },
             {
-                title: 'Economic Development',
-                description: 'Working towards economic prosperity and job creation for all Kenyans'
+                reason: 'Economic Development - Working towards economic prosperity and job creation for all Kenyans'
             },
             {
-                title: 'Good Governance',
-                description: 'Promoting transparency, accountability, and good governance practices'
+                reason: 'Good Governance - Promoting transparency, accountability, and good governance practices'
             },
             {
-                title: 'Youth Empowerment',
-                description: 'Creating opportunities for young people to thrive and contribute to nation building'
+                reason: 'Youth Empowerment - Creating opportunities for young people to thrive and contribute to nation building'
             },
             {
-                title: 'Healthcare Access',
-                description: 'Ensuring quality healthcare is accessible to all Kenyans'
+                reason: 'Healthcare Access - Ensuring quality healthcare is accessible to all Kenyans'
             }
         ],
         skipDuplicates: true
@@ -32,13 +27,11 @@ async function main() {
 
     // Create sample home page content
     await prisma.homePage.upsert({
-        where: { id: 'home-page' },
+        where: { id: 1 },
         update: {},
         create: {
-            id: 'home-page',
             title: 'David Maraga 2027',
-            description: 'Reset. Restore. Rebuild.',
-            content: 'Join David Maraga\'s presidential campaign for 2027. Together, we can build a Kenya that works for everyone through justice, integrity, and inclusive development.'
+            description: 'Reset. Restore. Rebuild.'
         }
     })
 

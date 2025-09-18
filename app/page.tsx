@@ -7,6 +7,7 @@ import LatestStatement from "../components/LatestStatement"
 import PressStatementsSection from "../components/PressStatementsSection"
 import AboutSection from "../components/AboutSection"
 import { parse } from "rss-to-json"
+import { prisma } from "@/lib/prisma"
 
 // Temporary placeholder data - will be replaced with Prisma queries
 const getPressStatements = cache(async () => {
@@ -18,10 +19,56 @@ const getFirstGallery = cache(async () => {
 })
 
 const getHomePage = cache(async () => {
-  return {
-    title: "David Maraga 2027",
-    description: "Reset. Restore. Rebuild.",
-    content: "Join David Maraga's presidential campaign for 2027. Together, we can build a Kenya that works for everyone through justice, integrity, and inclusive development."
+  try {
+    const homePage = await prisma.homePage.findFirst({
+      include: {
+        media: true,
+        home_page_attributes: {
+          orderBy: {
+            order: 'asc'
+          }
+        }
+      }
+    })
+
+    if (!homePage) {
+      // Return default data if no home page data exists
+      return {
+        title: "David Maraga 2027",
+        description: "Reset. Restore. Rebuild.",
+        image: null,
+        attributes: []
+      }
+    }
+
+    // For now, use the current image (we'll update this to use real photos later)
+    let imageData = null
+    if (homePage.media && homePage.media.url) {
+      imageData = {
+        id: homePage.media.id,
+        url: homePage.media.url,
+        alt: homePage.media.alt || "David Maraga - Presidential Candidate 2027"
+      }
+    }
+
+    return {
+      title: homePage.title || "David Maraga 2027",
+      description: homePage.description || "Reset. Restore. Rebuild.",
+      image: imageData,
+      attributes: homePage.home_page_attributes.map((attr: { title: string | null; description: string | null }) => ({
+        title: attr.title || "",
+        description: attr.description || ""
+      }))
+    }
+  } catch (error) {
+    console.error('Error fetching home page data:', error)
+    // Return default data on error
+    return {
+      title: "David Maraga 2027",
+      description: "Reset. Restore. Rebuild.",
+      image: null,
+      attributes: []
+    }
   }
 })
 
