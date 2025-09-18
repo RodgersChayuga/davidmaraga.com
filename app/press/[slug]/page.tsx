@@ -2,6 +2,8 @@ import { notFound } from "next/navigation"
 import { prisma } from "@/lib/prisma"
 import { cache } from "react"
 import React from "react"
+import serialize from "./serializer"
+import Link from "next/link"
 
 const getPressStatementBySlug = cache(async (slug: string) => {
   const statement = await prisma.pressStatement.findUnique({
@@ -22,6 +24,17 @@ export default async function PressStatementPage({ params }: { params: Promise<{
   return (
     <main className="py-16 bg-gray-50">
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+        {/* Back Navigation */}
+        <div className="mb-6">
+          <Link
+            href="/press"
+            className="inline-flex items-center gap-2 text-gray-600 hover:text-gray-900 transition-colors duration-200"
+          >
+            <span className="text-lg">←</span>
+            <span className="text-sm font-medium">Back to Press Statements</span>
+          </Link>
+        </div>
+
         <article className="bg-white rounded-lg shadow-lg overflow-hidden">
           <div className="p-8 md:p-12">
             <div className="text-center mb-8">
@@ -40,138 +53,43 @@ export default async function PressStatementPage({ params }: { params: Promise<{
               </span>
             </div>
 
-            <div className="prose max-w-none">
-              <div className="text-gray-800 leading-relaxed">
-                {(() => {
-                  // If content is a string, render it with proper paragraphs
-                  if (typeof statement.content === 'string') {
-                    return statement.content.split('\n\n').map((paragraph, index) =>
-                      paragraph.trim() ? <p key={index} className="mb-4">{paragraph}</p> : null
-                    );
+            <div className="prose prose-lg max-w-none mx-auto text-gray-800">
+              {(() => {
+                // If content is a string, render it with proper paragraphs
+                if (typeof statement.content === 'string') {
+                  return statement.content.split('\n\n').map((paragraph, index) =>
+                    paragraph.trim() ? <p key={index} className="mb-4">{paragraph}</p> : null
+                  );
+                }
+
+                // If content is an object with root.children (Lexical format), use serializer
+                if (statement.content && typeof statement.content === 'object' && 'root' in statement.content) {
+                  const contentObj = statement.content as { root: { children: any[] } };
+                  if (contentObj.root?.children) {
+                    return serialize(contentObj.root.children);
                   }
+                }
 
-                  // If content is an object, render the rich text structure with formatting
-                  if (statement.content && typeof statement.content === 'object') {
-                    const renderNode = (node: any, index: number = 0): React.ReactNode => {
-                      if (typeof node === 'string') {
-                        return node;
-                      }
-
-                      if (node?.text) {
-                        return node.text;
-                      }
-
-                      // Handle different node types with their formatting
-                      if (node?.type === 'p' && node?.children) {
-                        return (
-                          <p key={index} className="mb-4">
-                            {node.children.map((child: any, childIndex: number) =>
-                              renderNode(child, childIndex)
-                            )}
-                          </p>
-                        );
-                      }
-
-                      if (node?.type === 'heading' && node?.children) {
-                        const HeadingTag = `h${node.tag || 2}` as keyof JSX.IntrinsicElements;
-                        return (
-                          <HeadingTag key={index} className="font-bold text-xl mb-4 mt-6">
-                            {node.children.map((child: any, childIndex: number) =>
-                              renderNode(child, childIndex)
-                            )}
-                          </HeadingTag>
-                        );
-                      }
-
-                      if (node?.type === 'text') {
-                        let text = node.text || '';
-
-                        // Apply text formatting
-                        if (node.format) {
-                          if (node.format & 1) text = <strong key={index}>{text}</strong>; // Bold
-                          if (node.format & 2) text = <em key={index}>{text}</em>; // Italic
-                          if (node.format & 8) text = <u key={index}>{text}</u>; // Underline
-                          if (node.format & 16) text = <s key={index}>{text}</s>; // Strikethrough
-                        }
-
-                        return text;
-                      }
-
-                      if (node?.type === 'link' && node?.children) {
-                        return (
-                          <a
-                            key={index}
-                            href={node.url}
-                            className="text-blue-600 hover:text-blue-800 underline"
-                            target="_blank"
-                            rel="noopener noreferrer"
-                          >
-                            {node.children.map((child: any, childIndex: number) =>
-                              renderNode(child, childIndex)
-                            )}
-                          </a>
-                        );
-                      }
-
-                      if (node?.type === 'list' && node?.children) {
-                        const ListTag = node.listType === 'bullet' ? 'ul' : 'ol';
-                        return (
-                          <ListTag key={index} className="mb-4 ml-6">
-                            {node.children.map((child: any, childIndex: number) =>
-                              renderNode(child, childIndex)
-                            )}
-                          </ListTag>
-                        );
-                      }
-
-                      if (node?.type === 'listitem' && node?.children) {
-                        return (
-                          <li key={index} className="mb-2">
-                            {node.children.map((child: any, childIndex: number) =>
-                              renderNode(child, childIndex)
-                            )}
-                          </li>
-                        );
-                      }
-
-                      if (node?.children && Array.isArray(node.children)) {
-                        return node.children.map((child: any, childIndex: number) =>
-                          renderNode(child, childIndex)
-                        );
-                      }
-
-                      return null;
-                    };
-
-                    // If it has a root with children, render them
-                    if (statement.content && typeof statement.content === 'object' && 'root' in statement.content && statement.content.root?.children) {
-                      return statement.content.root.children.map((child: any, index: number) =>
-                        renderNode(child, index)
-                      );
-                    }
-
-                    // Fallback: extract all text and split by paragraphs
-                    const extractText = (node: any): string => {
-                      if (typeof node === 'string') return node;
-                      if (node?.text) return node.text;
-                      if (node?.children && Array.isArray(node.children)) {
-                        return node.children.map(extractText).join('');
-                      }
-                      return '';
-                    };
-
-                    const text = extractText(statement.content);
-                    if (text) {
-                      return text.split('\n\n').map((paragraph, index) =>
-                        paragraph.trim() ? <p key={index} className="mb-4">{paragraph}</p> : null
-                      );
-                    }
+                // Fallback: extract all text and split by paragraphs
+                const extractText = (node: any): string => {
+                  if (typeof node === 'string') return node;
+                  if (node?.text) return node.text;
+                  if (node && typeof node === 'object' && 'children' in node && Array.isArray(node.children)) {
+                    return node.children.map(extractText).join('');
                   }
+                  return '';
+                };
 
-                  // Fallback to excerpt
-                  return <p className="mb-4">{statement.excerpt || "Content not available"}</p>;
-                })()}
-              </div>
+                const text = extractText(statement.content);
+                if (text) {
+                  return text.split('\n\n').map((paragraph, index) =>
+                    paragraph.trim() ? <p key={index} className="mb-4">{paragraph}</p> : null
+                  );
+                }
+
+                // Fallback to excerpt
+                return <p className="mb-4">{statement.excerpt || "Content not available"}</p>;
+              })()}
             </div>
           </div>
         </article>
