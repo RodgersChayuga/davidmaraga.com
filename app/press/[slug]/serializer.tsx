@@ -4,6 +4,11 @@ import escapeHTML from 'escape-html';
 interface TextNode {
   type: 'text';
   text: string;
+  mode?: string;
+  style?: string;
+  detail?: number;
+  format?: number;
+  version?: number;
   bold?: boolean;
   italic?: boolean;
   underline?: boolean;
@@ -24,6 +29,24 @@ const serialize = (children: LexicalNode[]) => children.map((node, i) => {
     const textNode = node as TextNode;
     let text = <span key={`text-${i}`} dangerouslySetInnerHTML={{ __html: escapeHTML(textNode.text) }} />;
 
+    // Check for formatting in the format field (bitwise flags)
+    if (textNode.format) {
+      const format = textNode.format;
+      if (format & 1) { // Bold flag
+        text = <strong key={`bold-${i}`}>{text}</strong>;
+      }
+      if (format & 2) { // Italic flag
+        text = <em key={`italic-${i}`}>{text}</em>;
+      }
+      if (format & 8) { // Underline flag
+        text = <u key={`underline-${i}`}>{text}</u>;
+      }
+      if (format & 16) { // Strikethrough flag
+        text = <s key={`strikethrough-${i}`}>{text}</s>;
+      }
+    }
+
+    // Also check for explicit boolean properties (fallback)
     if (textNode.bold) {
       text = <strong key={`bold-${i}`}>{text}</strong>;
     }

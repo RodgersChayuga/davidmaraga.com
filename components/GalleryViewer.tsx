@@ -83,7 +83,7 @@ export default function GalleryViewer({ gallery }: GalleryViewerProps) {
 
   return (
     <>
- 
+
       {/* Image Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 mb-12">
         {currentImages.map((item, index) => (
@@ -92,17 +92,17 @@ export default function GalleryViewer({ gallery }: GalleryViewerProps) {
             className="relative aspect-square bg-gray-200 rounded-lg overflow-hidden cursor-pointer group hover-lift transition duration-300"
             onClick={() => openLightbox(index)}
           >
-            
+
             <Image
               src={(
-                typeof item === 'string' 
+                typeof item === 'string'
                   ? item
                   : typeof item === 'object' && item && 'url' in item
                     ? (item as any).url
                     : "/placeholder.svg"
               )}
               alt={(
-                typeof item === 'string' 
+                typeof item === 'string'
                   ? `Gallery image ${startIndex + index + 1}`
                   : typeof item === 'object' && item && 'alt' in item
                     ? (item as any).alt
@@ -145,9 +145,8 @@ export default function GalleryViewer({ gallery }: GalleryViewerProps) {
             <button
               key={page}
               onClick={() => goToPage(page)}
-              className={`px-4 py-2 rounded-lg transition duration-200 ${
-                currentPage === page ? "bg-maraga-green text-white" : "border border-gray-300 hover:bg-gray-50"
-              }`}
+              className={`px-4 py-2 rounded-lg transition duration-200 ${currentPage === page ? "bg-maraga-green text-white" : "border border-gray-300 hover:bg-gray-50"
+                }`}
             >
               {page}
             </button>
@@ -173,16 +172,16 @@ export default function GalleryViewer({ gallery }: GalleryViewerProps) {
               </svg>
             </button>
             <div className="relative">
-            <Image
+              <Image
                 src={(
-                  typeof images[selectedImage] === 'string' 
+                  typeof images[selectedImage] === 'string'
                     ? images[selectedImage]
                     : typeof images[selectedImage] === 'object' && images[selectedImage] && 'url' in images[selectedImage]
                       ? (images[selectedImage] as any).url
                       : "/placeholder.svg"
                 )}
                 alt={(
-                  typeof images[selectedImage] === 'string' 
+                  typeof images[selectedImage] === 'string'
                     ? `Gallery image ${selectedImage + 1}`
                     : typeof images[selectedImage] === 'object' && images[selectedImage] && 'alt' in images[selectedImage]
                       ? (images[selectedImage] as any).alt

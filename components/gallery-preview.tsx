@@ -31,8 +31,8 @@ export default function GalleryPreview({ gallery }: { gallery: Gall | null }) {
 
         <div className="mb-16 animate-scale-in animate-delay-400">
           {!gallery ||
-          !gallery.images ||
-          (Array.isArray(gallery.images) && gallery.images.length === 0) ? (
+            !gallery.images ||
+            (Array.isArray(gallery.images) && gallery.images.length === 0) ? (
             <div className="text-center">
               <span className="inline-block bg-gray-600 text-white px-4 py-2 rounded-full text-sm font-medium animate-pulse-slow">
                 Loading...
@@ -48,8 +48,8 @@ export default function GalleryPreview({ gallery }: { gallery: Gall | null }) {
                         ? typeof gallery.images[0] === 'string'
                           ? gallery.images[0]
                           : typeof gallery.images[0] === 'object' &&
-                              gallery.images[0] &&
-                              'url' in gallery.images[0]
+                            gallery.images[0] &&
+                            'url' in gallery.images[0]
                             ? (gallery.images[0] as { url: string }).url
                             : '/placeholder.svg'
                         : '/placeholder.svg'

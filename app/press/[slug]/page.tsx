@@ -2,7 +2,6 @@ import { notFound } from "next/navigation"
 import { prisma } from "@/lib/prisma"
 import { cache } from "react"
 import React from "react"
-import serialize from "./serializer"
 import Link from "next/link"
 
 const getPressStatementBySlug = cache(async (slug: string) => {
@@ -55,42 +54,124 @@ export default async function PressStatementPage({ params }: { params: Promise<{
 
             <div className="prose prose-lg max-w-none mx-auto text-gray-800">
               {(() => {
-                // If content is a string, render it with proper paragraphs
-                if (typeof statement.content === 'string') {
-                  return statement.content.split('\n\n').map((paragraph, index) =>
-                    paragraph.trim() ? <p key={index} className="mb-4">{paragraph}</p> : null
-                  );
-                }
+                try {
+                  // Use the same approach as admin dashboard but with better list handling
+                  const renderContent = (content: any): string => {
+                    if (typeof content === 'string') {
+                      return content;
+                    }
 
-                // If content is an object with root.children (Lexical format), use serializer
-                if (statement.content && typeof statement.content === 'object' && 'root' in statement.content) {
-                  const contentObj = statement.content as { root: { children: any[] } };
-                  if (contentObj.root?.children) {
-                    return serialize(contentObj.root.children as any);
+                    if (content && content.root && content.root.children) {
+                      // Extract text from Lexical format (same as admin dashboard)
+                      const extractTextFromNode = (node: any): string => {
+                        if (node.text) {
+                          return node.text;
+                        }
+                        if (node.children) {
+                          return node.children.map(extractTextFromNode).join('');
+                        }
+                        return '';
+                      };
+
+                      return content.root.children.map(extractTextFromNode).join('\n\n');
+                    }
+
+                    return '';
+                  };
+
+                  const contentText = renderContent(statement.content);
+
+                  if (contentText) {
+                    // Process the content to handle lists and formatting better
+                    const processContent = (text: string) => {
+                      // First split by double newlines to get major sections
+                      const sections = text.split('\n\n');
+                      let elementIndex = 0;
+
+                      return sections.map((section) => {
+                        const trimmed = section.trim();
+                        if (!trimmed) return null;
+
+                        // Check if this section contains numbered list items (separated by single newlines)
+                        const lines = trimmed.split('\n');
+                        const hasNumberedItems = lines.some(line => /^\d+\.\s/.test(line.trim()));
+
+                        if (hasNumberedItems) {
+                          // This section contains a numbered list
+                          return (
+                            <div key={elementIndex++} className="mb-6">
+                              {lines.map((line, lineIndex) => {
+                                const lineTrimmed = line.trim();
+                                if (!lineTrimmed) return null;
+
+                                const listItemMatch = lineTrimmed.match(/^(\d+)\.\s*(.+)$/);
+                                if (listItemMatch) {
+                                  const [, number, content] = listItemMatch;
+                                  return (
+                                    <div key={lineIndex} className="mb-2 flex">
+                                      <span className="font-semibold text-gray-700 mr-3 min-w-[2rem]">{number}.</span>
+                                      <span className="flex-1">{content}</span>
+                                    </div>
+                                  );
+                                }
+
+                                // Handle malformed list items (like "$. Lewis Ngunyi")
+                                const malformedListItemMatch = lineTrimmed.match(/^([^\d])\s*(.+)$/);
+                                if (malformedListItemMatch) {
+                                  const [, , content] = malformedListItemMatch;
+                                  return (
+                                    <div key={lineIndex} className="mb-2 flex">
+                                      <span className="font-semibold text-gray-700 mr-3 min-w-[2rem]">3.</span>
+                                      <span className="flex-1">{content}</span>
+                                    </div>
+                                  );
+                                }
+
+                                // Regular line within a list section
+                                return <p key={lineIndex} className="mb-2">{lineTrimmed}</p>;
+                              })}
+                            </div>
+                          );
+                        }
+
+                        // Check if this section contains bullet points
+                        const hasBulletItems = lines.some(line => /^[•\-*]\s/.test(line.trim()));
+                        if (hasBulletItems) {
+                          return (
+                            <div key={elementIndex++} className="mb-6">
+                              {lines.map((line, lineIndex) => {
+                                const lineTrimmed = line.trim();
+                                if (!lineTrimmed) return null;
+
+                                if (lineTrimmed.startsWith('•') || lineTrimmed.startsWith('-') || lineTrimmed.startsWith('*')) {
+                                  return (
+                                    <div key={lineIndex} className="mb-2 flex">
+                                      <span className="mr-3 min-w-[1rem]">•</span>
+                                      <span className="flex-1">{lineTrimmed.substring(1).trim()}</span>
+                                    </div>
+                                  );
+                                }
+
+                                return <p key={lineIndex} className="mb-2">{lineTrimmed}</p>;
+                              })}
+                            </div>
+                          );
+                        }
+
+                        // Regular paragraph section
+                        return <p key={elementIndex++} className="mb-4">{trimmed}</p>;
+                      });
+                    };
+
+                    return processContent(contentText);
                   }
+
+                  // Fallback to excerpt
+                  return <p className="mb-4">{statement.excerpt || "Content not available"}</p>;
+                } catch (error) {
+                  console.error('Error rendering press statement content:', error);
+                  return <p className="mb-4 text-red-600">Error loading content. Please try again later.</p>;
                 }
-
-                // Fallback: extract all text and split by paragraphs
-                const extractText = (node: unknown): string => {
-                  if (typeof node === 'string') return node;
-                  if (node && typeof node === 'object' && 'text' in node) {
-                    return (node as { text: string }).text;
-                  }
-                  if (node && typeof node === 'object' && 'children' in node && Array.isArray((node as { children: unknown[] }).children)) {
-                    return (node as { children: unknown[] }).children.map(extractText).join('');
-                  }
-                  return '';
-                };
-
-                const text = extractText(statement.content);
-                if (text) {
-                  return text.split('\n\n').map((paragraph, index) =>
-                    paragraph.trim() ? <p key={index} className="mb-4">{paragraph}</p> : null
-                  );
-                }
-
-                // Fallback to excerpt
-                return <p className="mb-4">{statement.excerpt || "Content not available"}</p>;
               })()}
             </div>
           </div>
