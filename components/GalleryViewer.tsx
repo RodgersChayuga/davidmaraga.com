@@ -12,7 +12,12 @@ interface GalleryImage {
   }
 }
 
-import { Gall } from "@/payload-types"
+interface Gall {
+  id: number
+  title: string
+  slug?: string | null
+  images?: any
+}
 
 interface GalleryViewerProps {
   gallery: Gall

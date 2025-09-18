@@ -66,16 +66,18 @@ export default async function PressStatementPage({ params }: { params: Promise<{
                 if (statement.content && typeof statement.content === 'object' && 'root' in statement.content) {
                   const contentObj = statement.content as { root: { children: any[] } };
                   if (contentObj.root?.children) {
-                    return serialize(contentObj.root.children);
+                    return serialize(contentObj.root.children as any);
                   }
                 }
 
                 // Fallback: extract all text and split by paragraphs
-                const extractText = (node: any): string => {
+                const extractText = (node: unknown): string => {
                   if (typeof node === 'string') return node;
-                  if (node?.text) return node.text;
-                  if (node && typeof node === 'object' && 'children' in node && Array.isArray(node.children)) {
-                    return node.children.map(extractText).join('');
+                  if (node && typeof node === 'object' && 'text' in node) {
+                    return (node as { text: string }).text;
+                  }
+                  if (node && typeof node === 'object' && 'children' in node && Array.isArray((node as { children: unknown[] }).children)) {
+                    return (node as { children: unknown[] }).children.map(extractText).join('');
                   }
                   return '';
                 };
@@ -108,7 +110,7 @@ export async function generateStaticParams() {
   })
 
   return pressStatements
-    .filter((p: any): p is { slug: string } => p.slug !== null)
+    .filter((p: { slug: string | null }): p is { slug: string } => p.slug !== null)
     .map((p: { slug: string }) => ({
       slug: p.slug,
     }))

@@ -1,8 +1,18 @@
-import type { Gall } from '@/payload-types'
 import Image from 'next/image'
 import Link from 'next/link'
 
-export default function GalleryPreview({ gallery }: { gallery: Gall }) {
+interface Gall {
+  id: number
+  title: string
+  slug?: string | null
+  images?: any
+}
+
+export default function GalleryPreview({ gallery }: { gallery: Gall | null }) {
+  if (!gallery) {
+    return null
+  }
+
   return (
     <section className="py-20 bg-gray-100 scroll-reveal">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">

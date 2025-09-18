@@ -3,7 +3,6 @@ import { prisma } from '@/lib/prisma'
 
 async function getTimelineEvents() {
   const events = await prisma.timeline.findMany({
-    where: { published: true },
     orderBy: { date: 'desc' },
     take: 100,
   })

@@ -1,9 +1,21 @@
 'use client'
-'use client'
 import { VerticalTimeline, VerticalTimelineElement } from 'react-vertical-timeline-component'
 import 'react-vertical-timeline-component/style.min.css'
-import { Timeline } from '@/payload-types'
 import Image from 'next/image'
+
+interface Timeline {
+  id: number
+  title: string
+  date: Date
+  description?: string | null
+  link?: string | null
+  label?: string | null
+  media?: Array<{
+    id: number
+    url?: string
+    alt?: string
+  }>
+}
 
 const EventTimeline = ({ events }: { events: Timeline[] }) => {
   return (
@@ -31,27 +43,14 @@ const EventTimeline = ({ events }: { events: Timeline[] }) => {
           >
             <h3 className="vertical-timeline-element-title text-2xl">{event.title}</h3>
             {event.description && <p className="font-thin">{event.description}</p>}
-            {media && media.blockType === 'imageMedia' && typeof media.image === 'object' && (
+            {media && media.url && (
               <Image
-                src={media.image.url || ''}
-                alt={media.image.alt || 'Timeline Image'}
+                src={media.url}
+                alt={media.alt || 'Timeline Image'}
                 width={500}
                 height={300}
                 className="w-full h-auto mt-4"
               />
-            )}
-            {media && media.blockType === 'youtubeLink' && (
-              <div className="mt-4">
-                <iframe
-                  width="100%"
-                  height="315"
-                  src={`https://www.youtube.com/embed/${media.url.split('v=')[1]}`}
-                  title="YouTube video player"
-                  frameBorder="0"
-                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                  allowFullScreen
-                ></iframe>
-              </div>
             )}
             {event.link && event.label && (
               <a href={event.link} className="text-blue-300 hover:underline mt-4 inline-block">

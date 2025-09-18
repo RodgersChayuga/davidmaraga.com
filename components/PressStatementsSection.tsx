@@ -1,5 +1,13 @@
 import Link from 'next/link'
-import type { PressStatement } from '@/payload-types'
+
+interface PressStatement {
+  id: number
+  title: string
+  date: Date
+  content: any
+  slug?: string | null
+  excerpt?: string | null
+}
 
 export default function PressStatementsSection({
   pressStatements,

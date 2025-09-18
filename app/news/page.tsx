@@ -3,7 +3,6 @@ import { cache } from 'react'
 
 const getPressStatements = cache(async () => {
   const pressStatements = await prisma.pressStatement.findMany({
-    where: { published: true },
     orderBy: { date: 'desc' },
   })
   return pressStatements

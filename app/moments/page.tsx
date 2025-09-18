@@ -4,10 +4,8 @@ import { prisma } from "@/lib/prisma"
 import { cache } from "react"
 
 const getGalleries = cache(async () => {
-  const galleries = await prisma.gallery.findMany({
-    where: { published: true },
-    orderBy: { createdAt: 'desc' },
-    include: { images: true },
+  const galleries = await prisma.gall.findMany({
+    orderBy: { created_at: 'desc' },
   })
   return galleries
 })

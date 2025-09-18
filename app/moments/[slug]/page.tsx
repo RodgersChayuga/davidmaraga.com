@@ -7,9 +7,8 @@ export default async function SingleGalleryPage({ params }: { params: Promise<{ 
   const resolvedParams = await params
 
   // Fetch gallery data directly from Prisma
-  const gallery = await prisma.gallery.findUnique({
+  const gallery = await prisma.gall.findUnique({
     where: { slug: resolvedParams.slug },
-    include: { images: true },
   })
 
   if (!gallery) {
