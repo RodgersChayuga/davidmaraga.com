@@ -1,0 +1,515 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id                            Int                             @id @default(autoincrement())
+  updated_at                    DateTime                        @default(now()) @db.Timestamptz(3)
+  created_at                    DateTime                        @default(now()) @db.Timestamptz(3)
+  name                          String                          @default("") @db.VarChar
+  email                         String                          @unique(map: "users_email_idx") @db.VarChar
+  reset_password_token          String?                         @db.VarChar
+  reset_password_expiration     DateTime?                       @db.Timestamptz(3)
+  salt                          String?                         @db.VarChar
+  hash                          String?                         @db.VarChar
+  login_attempts                Decimal?                        @default(0) @db.Decimal
+  lock_until                    DateTime?                       @db.Timestamptz(3)
+  is_dev                        Boolean?                        @default(false)
+  role                          String                          @default("general") @db.VarChar(20)
+  status                        String                          @default("active") @db.VarChar(20)
+  payload_locked_documents_rels payload_locked_documents_rels[]
+  payload_preferences_rels      payload_preferences_rels[]
+  users_sessions                users_sessions[]
+
+  @@index([created_at])
+  @@index([updated_at])
+  @@map("users")
+}
+
+model Media {
+  id                            Int                             @id @default(autoincrement())
+  alt                           String?                         @db.VarChar
+  updated_at                    DateTime                        @default(now()) @db.Timestamptz(3)
+  created_at                    DateTime                        @default(now()) @db.Timestamptz(3)
+  url                           String?                         @db.VarChar
+  thumbnail_u_r_l               String?                         @db.VarChar
+  filename                      String?                         @unique(map: "media_filename_idx") @db.VarChar
+  mime_type                     String?                         @db.VarChar
+  filesize                      Decimal?                        @db.Decimal
+  width                         Decimal?                        @db.Decimal
+  height                        Decimal?                        @db.Decimal
+  focal_x                       Decimal?                        @db.Decimal
+  focal_y                       Decimal?                        @db.Decimal
+  home_page                     HomePage[]
+  payload_locked_documents_rels payload_locked_documents_rels[]
+  timeline_blocks_image_media   timeline_blocks_image_media[]
+
+  @@index([created_at])
+  @@index([updated_at])
+  @@map("media")
+}
+
+model Volunteer {
+  id                            Int                             @id @default(autoincrement())
+  first_name                    String                          @db.VarChar
+  last_name                     String                          @db.VarChar
+  phone                         String                          @db.VarChar
+  email                         String                          @db.VarChar
+  additional_info               String?                         @db.VarChar
+  county                        String                          @db.VarChar
+  constituency                  String                          @db.VarChar
+  ward                          String                          @db.VarChar
+  updated_at                    DateTime                        @default(now()) @db.Timestamptz(3)
+  created_at                    DateTime                        @default(now()) @db.Timestamptz(3)
+  polling_station               String?                         @db.VarChar
+  volunteering_interests        String?                         @db.VarChar
+  payload_locked_documents_rels payload_locked_documents_rels[]
+  volunteers_rels               volunteers_rels[]
+
+  @@index([created_at])
+  @@index([updated_at])
+  @@map("volunteers")
+}
+
+model VolunteerReason {
+  id                            Int                             @id @default(autoincrement())
+  reason                        String                          @db.VarChar
+  updated_at                    DateTime                        @default(now()) @db.Timestamptz(3)
+  created_at                    DateTime                        @default(now()) @db.Timestamptz(3)
+  payload_locked_documents_rels payload_locked_documents_rels[]
+  volunteers_rels               volunteers_rels[]
+
+  @@index([created_at])
+  @@index([updated_at])
+  @@map("volunteer_reasons")
+}
+
+model PressStatement {
+  id                            Int                             @id @default(autoincrement())
+  title                         String                          @db.VarChar
+  date                          DateTime                        @db.Timestamptz(3)
+  content                       Json
+  slug                          String?                         @unique(map: "press_statements_slug_idx") @db.VarChar
+  updated_at                    DateTime                        @default(now()) @db.Timestamptz(3)
+  created_at                    DateTime                        @default(now()) @db.Timestamptz(3)
+  excerpt                       String?                         @db.VarChar
+  payload_locked_documents_rels payload_locked_documents_rels[]
+
+  @@index([created_at])
+  @@index([updated_at])
+  @@map("press_statements")
+}
+
+model Timeline {
+  id                            Int                             @id @default(autoincrement())
+  title                         String                          @db.VarChar
+  date                          DateTime                        @db.Timestamptz(3)
+  description                   String?                         @db.VarChar
+  link                          String?                         @db.VarChar
+  label                         String?                         @db.VarChar
+  updated_at                    DateTime                        @default(now()) @db.Timestamptz(3)
+  created_at                    DateTime                        @default(now()) @db.Timestamptz(3)
+  payload_locked_documents_rels payload_locked_documents_rels[]
+  timeline_blocks_image_media   timeline_blocks_image_media[]
+  timeline_blocks_youtube_link  timeline_blocks_youtube_link[]
+
+  @@index([created_at])
+  @@index([updated_at])
+  @@map("timeline")
+}
+
+model Log {
+  id                            Int                             @id @default(autoincrement())
+  title                         String                          @db.VarChar
+  log                           Json?
+  updated_at                    DateTime                        @default(now()) @db.Timestamptz(3)
+  created_at                    DateTime                        @default(now()) @db.Timestamptz(3)
+  payload_locked_documents_rels payload_locked_documents_rels[]
+
+  @@index([created_at])
+  @@index([updated_at])
+  @@map("logs")
+}
+
+model HomePage {
+  id                   Int                    @id @default(autoincrement())
+  title                String?                @db.VarChar
+  description          String?                @db.VarChar
+  image_id             Int?
+  updated_at           DateTime?              @db.Timestamptz(3)
+  created_at           DateTime?              @db.Timestamptz(3)
+  media                Media?                 @relation(fields: [image_id], references: [id], onUpdate: NoAction, map: "home_page_image_id_media_id_fk")
+  home_page_attributes home_page_attributes[]
+
+  @@index([image_id], map: "home_page_image_idx")
+  @@map("home_page")
+}
+
+model donation_stats_cache {
+  id                 String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  provider           String
+  total_amount_kes   Decimal   @default(0) @db.Decimal(15, 2)
+  total_donations    Int       @default(0)
+  total_donors       Int       @default(0)
+  currency_breakdown Json?     @default("{}")
+  recent_donations   Json?     @default("[]")
+  last_updated       DateTime  @default(now()) @db.Timestamp(6)
+  last_donation_at   DateTime? @db.Timestamp(6)
+  cache_version      Int?      @default(1)
+  is_active          Boolean?  @default(true)
+  error_message      String?
+}
+
+model events {
+  id          Int       @id @default(autoincrement())
+  title       String    @db.VarChar
+  description String?   @db.VarChar
+  date        DateTime  @db.Timestamptz(3)
+  time        String?   @db.VarChar
+  location    String    @db.VarChar
+  status      String?   @default("upcoming") @db.VarChar(20)
+  created_at  DateTime? @default(now()) @db.Timestamptz(3)
+  updated_at  DateTime? @default(now()) @db.Timestamptz(3)
+
+  @@index([created_at])
+  @@index([date])
+  @@index([status])
+  @@index([updated_at])
+}
+
+model exchange_rates {
+  id              String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  currency_code   String   @unique(map: "exchange_rates_currency_code_unique")
+  currency_name   String
+  currency_symbol String
+  rate_to_kes     Decimal  @db.Decimal(10, 4)
+  is_active       Boolean? @default(true)
+  is_zero_decimal Boolean? @default(false)
+  created_at      DateTime @default(now()) @db.Timestamp(6)
+  updated_at      DateTime @default(now()) @db.Timestamp(6)
+  last_updated_by String?
+}
+
+model gall {
+  id                            Int                             @id @default(autoincrement())
+  title                         String                          @db.VarChar
+  slug                          String?                         @unique(map: "gall_slug_idx") @db.VarChar
+  updated_at                    DateTime                        @default(now()) @db.Timestamptz(3)
+  created_at                    DateTime                        @default(now()) @db.Timestamptz(3)
+  images                        Json?
+  payload_locked_documents_rels payload_locked_documents_rels[]
+
+  @@index([created_at])
+  @@index([updated_at])
+}
+
+model global_donation_stats {
+  id                 String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  total_amount_kes   Decimal   @default(0) @db.Decimal(15, 2)
+  total_donations    Int       @default(0)
+  total_donors       Int       @default(0)
+  provider_breakdown Json?     @default("{}")
+  exchange_rates     Json?     @default("{}")
+  recent_donations   Json?     @default("[]")
+  last_updated       DateTime  @default(now()) @db.Timestamp(6)
+  last_donation_at   DateTime? @db.Timestamp(6)
+  cache_version      Int?      @default(1)
+  is_active          Boolean?  @default(true)
+}
+
+model home_page_attributes {
+  order       Int      @map("_order")
+  parent_id   Int      @map("_parent_id")
+  id          String   @id @db.VarChar
+  title       String?  @db.VarChar
+  description String?  @db.VarChar
+  home_page   HomePage @relation(fields: [parent_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "home_page_attributes_parent_id_fk")
+
+  @@index([order], map: "home_page_attributes_order_idx")
+  @@index([parent_id], map: "home_page_attributes_parent_id_idx")
+}
+
+model members {
+  id         Int       @id @default(autoincrement())
+  name       String    @db.VarChar(255)
+  email      String    @db.VarChar(255)
+  phone      String?   @db.VarChar(20)
+  location   String?   @db.VarChar(255)
+  title      String?   @db.VarChar(255)
+  position   String?   @db.VarChar(255)
+  status     String?   @default("Pending") @db.VarChar(20)
+  join_date  DateTime? @default(dbgenerated("CURRENT_DATE")) @db.Date
+  department String?   @db.VarChar(255)
+  created_at DateTime? @default(now()) @db.Timestamp(6)
+  updated_at DateTime? @default(now()) @db.Timestamp(6)
+}
+
+model mpesa_donations {
+  id                      String             @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  donor_name              String
+  donor_email             String
+  donor_phone             String
+  is_anonymous            Boolean?           @default(false)
+  amount                  Decimal            @db.Decimal(10, 2)
+  currency                String             @default("KES")
+  donation_type           String             @default("one-time")
+  message                 String?
+  display_donation        Boolean?           @default(false)
+  mookhpay_transaction_id String             @unique(map: "mpesa_donations_mookhpay_transaction_id_unique")
+  mookhpay_order_number   String
+  mookhpay_checkout_url   String?
+  payment_status          String             @default("pending")
+  transaction_id          String             @unique(map: "mpesa_donations_transaction_id_unique")
+  created_at              DateTime           @default(now()) @db.Timestamp(6)
+  updated_at              DateTime           @default(now()) @db.Timestamp(6)
+  completed_at            DateTime?          @db.Timestamp(6)
+  campaign_id             String?            @default("david-maraga")
+  payment_attempts        payment_attempts[]
+}
+
+model payload_locked_documents {
+  id                            Int                             @id @default(autoincrement())
+  global_slug                   String?                         @db.VarChar
+  updated_at                    DateTime                        @default(now()) @db.Timestamptz(3)
+  created_at                    DateTime                        @default(now()) @db.Timestamptz(3)
+  payload_locked_documents_rels payload_locked_documents_rels[]
+
+  @@index([created_at])
+  @@index([global_slug])
+  @@index([updated_at])
+}
+
+model payload_locked_documents_rels {
+  id                       Int                      @id @default(autoincrement())
+  order                    Int?
+  parent_id                Int
+  path                     String                   @db.VarChar
+  users_id                 Int?
+  media_id                 Int?
+  volunteers_id            Int?
+  volunteer_reasons_id     Int?
+  press_statements_id      Int?
+  gall_id                  Int?
+  logs_id                  Int?
+  timeline_id              Int?
+  gall                     gall?                    @relation(fields: [gall_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "payload_locked_documents_rels_gall_fk")
+  logs                     Log?                     @relation(fields: [logs_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "payload_locked_documents_rels_logs_fk")
+  media                    Media?                   @relation(fields: [media_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "payload_locked_documents_rels_media_fk")
+  payload_locked_documents payload_locked_documents @relation(fields: [parent_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "payload_locked_documents_rels_parent_fk")
+  press_statements         PressStatement?          @relation(fields: [press_statements_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "payload_locked_documents_rels_press_statements_fk")
+  timeline                 Timeline?                @relation(fields: [timeline_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "payload_locked_documents_rels_timeline_fk")
+  users                    User?                    @relation(fields: [users_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "payload_locked_documents_rels_users_fk")
+  volunteer_reasons        VolunteerReason?         @relation(fields: [volunteer_reasons_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "payload_locked_documents_rels_volunteer_reasons_fk")
+  volunteers               Volunteer?               @relation(fields: [volunteers_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "payload_locked_documents_rels_volunteers_fk")
+
+  @@index([gall_id])
+  @@index([logs_id])
+  @@index([media_id])
+  @@index([order])
+  @@index([parent_id], map: "payload_locked_documents_rels_parent_idx")
+  @@index([path])
+  @@index([press_statements_id])
+  @@index([timeline_id])
+  @@index([users_id])
+  @@index([volunteer_reasons_id])
+  @@index([volunteers_id])
+}
+
+model payload_migrations {
+  id         Int      @id @default(autoincrement())
+  name       String?  @db.VarChar
+  batch      Decimal? @db.Decimal
+  updated_at DateTime @default(now()) @db.Timestamptz(3)
+  created_at DateTime @default(now()) @db.Timestamptz(3)
+
+  @@index([created_at])
+  @@index([updated_at])
+}
+
+model payload_preferences {
+  id                       Int                        @id @default(autoincrement())
+  key                      String?                    @db.VarChar
+  value                    Json?
+  updated_at               DateTime                   @default(now()) @db.Timestamptz(3)
+  created_at               DateTime                   @default(now()) @db.Timestamptz(3)
+  payload_preferences_rels payload_preferences_rels[]
+
+  @@index([created_at])
+  @@index([key])
+  @@index([updated_at])
+}
+
+model payload_preferences_rels {
+  id                  Int                 @id @default(autoincrement())
+  order               Int?
+  parent_id           Int
+  path                String              @db.VarChar
+  users_id            Int?
+  payload_preferences payload_preferences @relation(fields: [parent_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "payload_preferences_rels_parent_fk")
+  users               User?               @relation(fields: [users_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "payload_preferences_rels_users_fk")
+
+  @@index([order])
+  @@index([parent_id], map: "payload_preferences_rels_parent_idx")
+  @@index([path])
+  @@index([users_id])
+}
+
+model payment_attempts {
+  id                 String            @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  stripe_donation_id String?           @db.Uuid
+  paypal_donation_id String?           @db.Uuid
+  mpesa_donation_id  String?           @db.Uuid
+  payment_method     String
+  status             String
+  gateway_response   Json?
+  error_message      String?
+  error_code         String?
+  created_at         DateTime          @default(now()) @db.Timestamp(6)
+  mpesa_donations    mpesa_donations?  @relation(fields: [mpesa_donation_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "payment_attempts_mpesa_donation_id_mpesa_donations_id_fk")
+  paypal_donations   paypal_donations? @relation(fields: [paypal_donation_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "payment_attempts_paypal_donation_id_paypal_donations_id_fk")
+  stripe_donations   stripe_donations? @relation(fields: [stripe_donation_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "payment_attempts_stripe_donation_id_stripe_donations_id_fk")
+}
+
+model paypal_donations {
+  id                     String                @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  donor_name             String
+  donor_email            String
+  donor_phone            String?
+  is_anonymous           Boolean?              @default(false)
+  amount                 Decimal               @db.Decimal(10, 2)
+  currency               String                @default("USD")
+  donation_type          String                @default("one-time")
+  message                String?
+  display_donation       Boolean?              @default(false)
+  paypal_order_id        String                @unique(map: "paypal_donations_paypal_order_id_unique")
+  paypal_payment_id      String?
+  paypal_payer_id        String?
+  paypal_capture_id      String?
+  paypal_subscription_id String?
+  payment_status         String                @default("pending")
+  transaction_id         String                @unique(map: "paypal_donations_transaction_id_unique")
+  created_at             DateTime              @default(now()) @db.Timestamp(6)
+  updated_at             DateTime              @default(now()) @db.Timestamp(6)
+  completed_at           DateTime?             @db.Timestamp(6)
+  campaign_id            String?               @default("david-maraga")
+  payment_attempts       payment_attempts[]
+  recurring_donations    recurring_donations[]
+}
+
+model recurring_donations {
+  id                     String            @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  stripe_donation_id     String?           @db.Uuid
+  paypal_donation_id     String?           @db.Uuid
+  stripe_subscription_id String?
+  paypal_subscription_id String?
+  status                 String            @default("active")
+  interval               String            @default("month")
+  interval_count         Int?              @default(1)
+  next_payment_date      DateTime?         @db.Timestamp(6)
+  last_payment_date      DateTime?         @db.Timestamp(6)
+  failed_payment_count   Int?              @default(0)
+  created_at             DateTime          @default(now()) @db.Timestamp(6)
+  updated_at             DateTime          @default(now()) @db.Timestamp(6)
+  cancelled_at           DateTime?         @db.Timestamp(6)
+  paypal_donations       paypal_donations? @relation(fields: [paypal_donation_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "recurring_donations_paypal_donation_id_paypal_donations_id_fk")
+  stripe_donations       stripe_donations? @relation(fields: [stripe_donation_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "recurring_donations_stripe_donation_id_stripe_donations_id_fk")
+}
+
+model referral_invites {
+  id                      String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  referrer_name           String
+  referred_name           String?
+  referred_phone          String
+  donation_provider       String?
+  donation_transaction_id String?
+  contacted_at            DateTime? @db.Timestamp(6)
+  opted_out               Boolean?  @default(false)
+  created_at              DateTime  @default(now()) @db.Timestamp(6)
+}
+
+model stripe_donations {
+  id                       String                @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  donor_name               String
+  donor_email              String
+  donor_phone              String?
+  is_anonymous             Boolean?              @default(false)
+  amount                   Decimal               @db.Decimal(10, 2)
+  currency                 String                @default("USD")
+  donation_type            String                @default("one-time")
+  message                  String?
+  display_donation         Boolean?              @default(false)
+  stripe_payment_intent_id String                @unique(map: "stripe_donations_stripe_payment_intent_id_unique")
+  stripe_customer_id       String?
+  stripe_charge_id         String?
+  stripe_subscription_id   String?
+  payment_status           String                @default("pending")
+  transaction_id           String                @unique(map: "stripe_donations_transaction_id_unique")
+  created_at               DateTime              @default(now()) @db.Timestamp(6)
+  updated_at               DateTime              @default(now()) @db.Timestamp(6)
+  completed_at             DateTime?             @db.Timestamp(6)
+  campaign_id              String?               @default("david-maraga")
+  payment_attempts         payment_attempts[]
+  recurring_donations      recurring_donations[]
+}
+
+model timeline_blocks_image_media {
+  order      Int      @map("_order")
+  parent_id  Int      @map("_parent_id")
+  path       String   @map("_path")
+  id         String   @id @db.VarChar
+  image_id   Int
+  block_name String?  @db.VarChar
+  media      Media    @relation(fields: [image_id], references: [id], onDelete: SetNull, onUpdate: NoAction, map: "timeline_blocks_image_media_image_id_media_id_fk")
+  timeline   Timeline @relation(fields: [parent_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "timeline_blocks_image_media_parent_id_fk")
+
+  @@index([image_id], map: "timeline_blocks_image_media_image_idx")
+  @@index([order], map: "timeline_blocks_image_media_order_idx")
+  @@index([parent_id], map: "timeline_blocks_image_media_parent_id_idx")
+  @@index([path], map: "timeline_blocks_image_media_path_idx")
+}
+
+model timeline_blocks_youtube_link {
+  order      Int      @map("_order")
+  parent_id  Int      @map("_parent_id")
+  path       String   @map("_path")
+  id         String   @id @db.VarChar
+  url        String   @db.VarChar
+  block_name String?  @db.VarChar
+  timeline   Timeline @relation(fields: [parent_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "timeline_blocks_youtube_link_parent_id_fk")
+
+  @@index([order], map: "timeline_blocks_youtube_link_order_idx")
+  @@index([parent_id], map: "timeline_blocks_youtube_link_parent_id_idx")
+  @@index([path], map: "timeline_blocks_youtube_link_path_idx")
+}
+
+model users_sessions {
+  order      Int       @map("_order")
+  parent_id  Int       @map("_parent_id")
+  id         String    @id @db.VarChar
+  created_at DateTime? @db.Timestamptz(3)
+  expires_at DateTime  @db.Timestamptz(3)
+  users      User      @relation(fields: [parent_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "users_sessions_parent_id_fk")
+
+  @@index([order], map: "users_sessions_order_idx")
+  @@index([parent_id], map: "users_sessions_parent_id_idx")
+}
+
+model volunteers_rels {
+  id                   Int              @id @default(autoincrement())
+  order                Int?
+  parent_id            Int
+  path                 String           @db.VarChar
+  volunteer_reasons_id Int?
+  volunteers           Volunteer        @relation(fields: [parent_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "volunteers_rels_parent_fk")
+  volunteer_reasons    VolunteerReason? @relation(fields: [volunteer_reasons_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "volunteers_rels_volunteer_reasons_fk")
+
+  @@index([order])
+  @@index([parent_id], map: "volunteers_rels_parent_idx")
+  @@index([path])
+  @@index([volunteer_reasons_id])
+}

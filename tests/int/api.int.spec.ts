@@ -1,20 +1,14 @@
-import { getPayload, Payload } from 'payload'
-import config from '@/payload.config'
-
+import { prisma } from '@/lib/prisma'
 import { describe, it, beforeAll, expect } from 'vitest'
-
-let payload: Payload
 
 describe('API', () => {
   beforeAll(async () => {
-    const payloadConfig = await config
-    payload = await getPayload({ config: payloadConfig })
+    // Initialize Prisma connection
+    await prisma.$connect()
   })
 
   it('fetches users', async () => {
-    const users = await payload.find({
-      collection: 'users',
-    })
+    const users = await prisma.user.findMany()
     expect(users).toBeDefined()
   })
 })
