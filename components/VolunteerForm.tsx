@@ -240,7 +240,7 @@ export default function VolunteerForm({
         <div className="max-w-4xl mx-auto animate-scale-in animate-delay-400">
           <div className="bg-white/95 backdrop-blur-sm text-gray-900 p-8 md:p-12 rounded-xl shadow-2xl hover-lift">
             <h3 className="text-3xl font-serif font-bold mb-6 text-green-600 text-center animate-fade-in">
-              Volunteer with Us
+              Voter Drive
             </h3>
             <p className="text-gray-600 mb-8 text-center animate-fade-in animate-delay-200">
               Fill out the form below to join thousands of Kenyans working to bring positive change
