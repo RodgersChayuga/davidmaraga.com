@@ -442,13 +442,13 @@ export default function VolunteerForm({
                       >
                         <input
                           type="checkbox"
-                          id={reason.id}
+                          id={`reason-${reason.id}`}
                           checked={formData.volunteering.includes(reason.id)}
                           onChange={(e) => handleVolunteeringChange(reason.id, e.target.checked)}
                           className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
                         />
                         <label
-                          htmlFor={reason.id}
+                          htmlFor={`reason-${reason.id}`}
                           className="cursor-pointer flex-1 text-sm font-medium text-gray-700"
                         >
                           {reason.reason}
@@ -514,7 +514,7 @@ export default function VolunteerForm({
                     Submitting...
                   </span>
                 ) : (
-                  'Join as Voter Drive 🚀'
+                  'Join the Voter Drive 🚀'
                 )}
                 {/* Change button text when submitting */}
               </button>

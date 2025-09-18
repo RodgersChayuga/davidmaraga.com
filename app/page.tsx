@@ -73,7 +73,15 @@ const getHomePage = cache(async () => {
 })
 
 const getVolunteerReasons = cache(async () => {
-  return []
+  try {
+    const reasons = await prisma.volunteerReason.findMany({
+      orderBy: { id: 'asc' }
+    })
+    return reasons
+  } catch (error) {
+    console.error('Error fetching volunteer reasons:', error)
+    return []
+  }
 })
 
 const getYouTubeVideos = cache(async () => {
