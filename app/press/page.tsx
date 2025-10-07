@@ -8,8 +8,8 @@ const getPressStatements = async () => {
   return pressStatements
 }
 
-// Revalidate every 60 seconds
-export const revalidate = 60
+// Revalidate every 5 seconds for testing
+export const revalidate = 5
 
 export default async function PressPage() {
   const pressStatements = await getPressStatements()
