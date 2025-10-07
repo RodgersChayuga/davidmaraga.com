@@ -3,16 +3,28 @@ import { prisma } from '@/lib/prisma'
 import { parse } from 'rss-to-json'
 import { revalidatePath } from 'next/cache'
 
+// Simple fetch timeout helper to prevent hangs on external calls (e.g., reCAPTCHA)
+async function fetchWithTimeout(input: RequestInfo | URL, init: RequestInit = {}, timeoutMs = 10000) {
+  const controller = new AbortController()
+  const id = setTimeout(() => controller.abort(), timeoutMs)
+  try {
+    const resp = await fetch(input, { ...init, signal: controller.signal })
+    return resp
+  } finally {
+    clearTimeout(id)
+  }
+}
+
 export const getPressStatements = async (reCaptchaToken: string) => {
   'use server'
   try {
-    const recaptchaResponse = await fetch('https://www.google.com/recaptcha/api/siteverify', {
+    const recaptchaResponse = await fetchWithTimeout('https://www.google.com/recaptcha/api/siteverify', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/x-www-form-urlencoded',
       },
       body: `secret=${process.env.RECAPTCHA_SECRET_KEY}&response=${reCaptchaToken}`,
-    })
+    }, 10000)
     const recaptchaData = await recaptchaResponse.json()
 
     if (!recaptchaData.success) {
@@ -49,14 +61,48 @@ interface VolunteerFormData {
 
 export const createVolunteer = async (formData: VolunteerFormData, reCaptchaToken: string) => {
   'use server'
+
+  // Get the actual reason text for the selected IDs
+  const selectedReasons = await prisma.volunteerReason.findMany({
+    where: {
+      id: {
+        in: formData.volunteering
+      }
+    },
+    select: {
+      reason: true
+    }
+  })
+
+  const reasonTexts = selectedReasons.map(r => r.reason).join(', ')
+
+  const createVolunteerData = {
+    first_name: formData.firstName,
+    last_name: formData.lastName,
+    phone: formData.phone,
+    email: formData.email,
+    additional_info: formData.additionalInfo,
+    county: formData.county,
+    constituency: formData.constituency,
+    ward: formData.ward,
+    polling_station: formData.pollingStation,
+    volunteering_interests: reasonTexts,
+    volunteers_rels: {
+      create: formData.volunteering.map((reasonId) => ({
+        volunteer_reasons_id: reasonId,
+        path: 'volunteering',
+      })),
+    },
+  }
+
   try {
-    const recaptchaResponse = await fetch('https://www.google.com/recaptcha/api/siteverify', {
+    const recaptchaResponse = await fetchWithTimeout('https://www.google.com/recaptcha/api/siteverify', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/x-www-form-urlencoded',
       },
       body: `secret=${process.env.RECAPTCHA_SECRET_KEY}&response=${reCaptchaToken}`,
-    })
+    }, 10000)
     const recaptchaData = await recaptchaResponse.json()
 
     if (!recaptchaData.success) {
@@ -64,57 +110,49 @@ export const createVolunteer = async (formData: VolunteerFormData, reCaptchaToke
       return { success: false, message: 'reCAPTCHA verification failed.' }
     }
 
-    // Get the actual reason text for the selected IDs
-    const selectedReasons = await prisma.volunteerReason.findMany({
-      where: {
-        id: {
-          in: formData.volunteering
-        }
-      },
-      select: {
-        reason: true
-      }
-    })
-
-    const reasonTexts = selectedReasons.map(r => r.reason).join(', ')
-
     console.log('formData', formData)
+
     await prisma.volunteer.create({
-      data: {
-        first_name: formData.firstName,
-        last_name: formData.lastName,
-        phone: formData.phone,
-        email: formData.email,
-        additional_info: formData.additionalInfo,
-        county: formData.county,
-        constituency: formData.constituency,
-        ward: formData.ward,
-        polling_station: formData.pollingStation,
-        volunteering_interests: reasonTexts,
-        volunteers_rels: {
-          create: formData.volunteering.map((reasonId) => ({
-            volunteer_reasons_id: reasonId,
-            path: 'volunteering',
-          })),
-        },
-      },
+      data: createVolunteerData
     })
     return { success: true, message: 'Volunteer created successfully!' }
-  } catch (error) {
+  } catch (error: any) {
     console.error('Error creating volunteer:', error)
-    return { success: false, message: 'Failed to create volunteer.' }
+
+    // Handle specific Prisma errors
+    if (error.code === 'P2002') {
+      if (error.meta?.target?.includes('id')) {
+        // Sequence issue - try to fix it and retry once
+        try {
+          await prisma.$executeRaw`SELECT setval('volunteers_id_seq', (SELECT MAX(id) FROM volunteers) + 1, false);`
+
+          // Retry the creation with the same data
+          await prisma.volunteer.create({
+            data: createVolunteerData
+          })
+          return { success: true, message: 'Volunteer created successfully!' }
+        } catch (retryError) {
+          console.error('Retry failed:', retryError)
+          return { success: false, message: 'Database error. Please try again.' }
+        }
+      } else if (error.meta?.target?.includes('email')) {
+        return { success: false, message: 'This email address is already registered.' }
+      }
+    }
+
+    return { success: false, message: 'Failed to create volunteer. Please try again.' }
   }
 }
 export const getVolunteerReasons = async (reCaptchaToken: string) => {
   'use server'
   try {
-    const recaptchaResponse = await fetch('https://www.google.com/recaptcha/api/siteverify', {
+    const recaptchaResponse = await fetchWithTimeout('https://www.google.com/recaptcha/api/siteverify', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/x-www-form-urlencoded',
       },
       body: `secret=${process.env.RECAPTCHA_SECRET_KEY}&response=${reCaptchaToken}`,
-    })
+    }, 10000)
     const recaptchaData = await recaptchaResponse.json()
 
     if (!recaptchaData.success) {
@@ -136,13 +174,13 @@ export const getVolunteerReasons = async (reCaptchaToken: string) => {
 export const getHomePage = async (reCaptchaToken: string) => {
   'use server'
   try {
-    const recaptchaResponse = await fetch('https://www.google.com/recaptcha/api/siteverify', {
+    const recaptchaResponse = await fetchWithTimeout('https://www.google.com/recaptcha/api/siteverify', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/x-www-form-urlencoded',
       },
       body: `secret=${process.env.RECAPTCHA_SECRET_KEY}&response=${reCaptchaToken}`,
-    })
+    }, 10000)
     const recaptchaData = await recaptchaResponse.json()
 
     if (!recaptchaData.success) {
@@ -163,13 +201,13 @@ export const getHomePage = async (reCaptchaToken: string) => {
 export const getVolunteerCount = async (reCaptchaToken: string) => {
   'use server'
   try {
-    const recaptchaResponse = await fetch('https://www.google.com/recaptcha/api/siteverify', {
+    const recaptchaResponse = await fetchWithTimeout('https://www.google.com/recaptcha/api/siteverify', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/x-www-form-urlencoded',
       },
       body: `secret=${process.env.RECAPTCHA_SECRET_KEY}&response=${reCaptchaToken}`,
-    })
+    }, 10000)
     const recaptchaData = await recaptchaResponse.json()
 
     if (!recaptchaData.success) {
@@ -191,13 +229,13 @@ export const getVolunteerCount = async (reCaptchaToken: string) => {
 export const getYouTubeVideos = async (reCaptchaToken: string) => {
   'use server'
   try {
-    const recaptchaResponse = await fetch('https://www.google.com/recaptcha/api/siteverify', {
+    const recaptchaResponse = await fetchWithTimeout('https://www.google.com/recaptcha/api/siteverify', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/x-www-form-urlencoded',
       },
       body: `secret=${process.env.RECAPTCHA_SECRET_KEY}&response=${reCaptchaToken}`,
-    })
+    }, 10000)
     const recaptchaData = await recaptchaResponse.json()
 
     if (!recaptchaData.success) {

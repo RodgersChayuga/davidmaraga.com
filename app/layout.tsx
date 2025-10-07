@@ -52,7 +52,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <meta property="og:type" content="website" />
       </head>
       <body className="font-sans">
-        <ReCaptchaProvider reCaptchaKey={process.env.RECAPTCHA_SITE_KEY!}>
+        <ReCaptchaProvider reCaptchaKey={process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY!}>
           <div className="min-h-screen bg-white">
             <NextTopLoader color="#34D399" />
             <Header />

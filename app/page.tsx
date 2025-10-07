@@ -9,9 +9,17 @@ import AboutSection from "../components/AboutSection"
 import { parse } from "rss-to-json"
 import { prisma } from "@/lib/prisma"
 
-// Temporary placeholder data - will be replaced with Prisma queries
 const getPressStatements = cache(async () => {
-  return []
+  try {
+    const pressStatements = await prisma.pressStatement.findMany({
+      orderBy: { date: 'desc' },
+      take: 3,
+    })
+    return pressStatements
+  } catch (error) {
+    console.error('Error fetching press statements:', error)
+    return []
+  }
 })
 
 const getFirstGallery = cache(async () => {
@@ -105,7 +113,7 @@ const getYouTubeVideos = cache(async () => {
   return videos
 })
 
-export const revalidate = 60
+export const revalidate = 5
 
 export default async function HomePage() {
   const [pressStatements, gallery, homePage, volunteerReasons, youtubeVideos] = await Promise.all([

@@ -128,14 +128,64 @@ export default function VolunteerForm({
     e.preventDefault()
     setSubmittingForm(true)
 
-    if (!formData.phone) {
+    // Hard client-side timeout so UI recovers even if server hangs
+    const submissionTimeout = setTimeout(() => {
+      setSubmittingForm(false)
+      showNotification('Request timed out. Please try again.', 'error')
+    }, 15000)
+
+    // Validate required fields
+    if (!formData.firstName.trim()) {
+      toast.error('Please enter your first name.')
+      setSubmittingForm(false)
+      return
+    }
+
+    if (!formData.lastName.trim()) {
+      toast.error('Please enter your last name.')
+      setSubmittingForm(false)
+      return
+    }
+
+    if (!formData.phone.trim()) {
       toast.error('Please enter your phone number.')
+      setSubmittingForm(false)
+      return
+    }
+
+    if (!formData.email.trim()) {
+      toast.error('Please enter your email address.')
+      setSubmittingForm(false)
+      return
+    }
+
+    if (!formData.county) {
+      toast.error('Please select your county.')
+      setSubmittingForm(false)
+      return
+    }
+
+    if (!formData.constituency) {
+      toast.error('Please select your constituency.')
+      setSubmittingForm(false)
+      return
+    }
+
+    if (!formData.ward) {
+      toast.error('Please select your ward.')
+      setSubmittingForm(false)
+      return
+    }
+
+    if (formData.volunteering.length === 0) {
+      toast.error('Please select at least one volunteer interest.')
       setSubmittingForm(false)
       return
     }
 
     if (!executeRecaptcha) {
       console.log('Execute recaptcha not yet available')
+      setSubmittingForm(false)
       return
     }
 
@@ -164,12 +214,13 @@ export default function VolunteerForm({
         setShowSuccessMessage(true)
         // Update total volunteers after successful submission
       } else {
-        showNotification('Something went wrong. Please try again.', 'error')
+        showNotification(result.message || 'Something went wrong. Please try again.', 'error')
       }
     } catch (error) {
       console.error('Form submission error:', error)
-      showNotification('Something went wrong. Please try again.', 'error')
+      showNotification('Network error. Please check your connection and try again.', 'error')
     } finally {
+      clearTimeout(submissionTimeout)
       setSubmittingForm(false)
     }
   }
